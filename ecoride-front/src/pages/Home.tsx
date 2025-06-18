@@ -11,6 +11,7 @@ export default function Home() {
         <ItineraireSearch />
       </header>
 
+            {/* Contenu principal */}
       <main className="flex-grow p-4">
         {/* Tu peux mettre ici les covoiturages récents, les offres, etc. */}
       </main>
