@@ -1,7 +1,7 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import userRoutes from "./routes/user.routes";
+import users from "./routes/user.routes";
 import { connectDB } from "./config/db";
 import avisRoutes from "./routes/avis.routes";
 import { connectMongo } from "./config/mongo";
@@ -17,7 +17,7 @@ const PORT = process.env.PORT || 3010;
 app.use(cors());
 app.use(express.json());
 
-app.use("/api/users", userRoutes);
+app.use("/api/users", users);
 app.use("/api/covoiturage", covoiturage)
 
 connectDB();

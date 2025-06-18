@@ -12,17 +12,32 @@ export default function Home() {
       </header>
 
             {/* Contenu principal */}
-      <main className="flex-grow p-4">
-        {/* Tu peux mettre ici les covoiturages récents, les offres, etc. */}
-      </main>
+      <section className="text-center mb-12">
+        <h1 className="text-4xl font-bold text-green-700 mb-4">Bienvenue chez EcoRide 🌱</h1>
+        <p className="text-lg text-gray-700 max-w-3xl mx-auto">
+          EcoRide est une startup engagée pour un avenir plus vert 🌍. Notre mission est de réduire l’impact
+          environnemental des transports en facilitant le covoiturage entre particuliers. Rejoignez la
+          communauté de ceux qui roulent plus propre, plus solidaire, et plus économique.
+        </p>
+      </section>
 
-      {/* Contenu principal */}
-      <main className="flex-grow p-4">
-        {/* Tu peux mettre ici les covoiturages récents, les offres, etc. */}
-      </main>
-
-      {/* Footer */}
-      <Footer />
+      <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <img
+          src="/images/ecologie1.jpg"
+          alt="Voiture électrique en pleine nature"
+          className="rounded shadow-lg object-cover w-full"
+        />
+        <img
+          src="/images/ecologie2.jpg"
+          alt="Gens partageant un trajet ensemble"
+          className="rounded shadow-lg object-cover  w-full"
+        />
+        <img
+          src="/images/ecologie3.jpg"
+          alt="Feuille verte en main"
+          className="rounded shadow-lg object-cover w-full"
+        />
+      </section>
     </div>
   );
 }

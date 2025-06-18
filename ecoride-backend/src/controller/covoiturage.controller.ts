@@ -71,17 +71,42 @@ export const participerCovoiturage = async (req: Request, res: Response) => {
 
 export const searchItineraire = async (req: Request, res: Response) => {
   try {
-    const { lieu_depart, lieu_arrivee } = req.body;
+    const { lieu_depart, lieu_arrivee, date } = req.body;
 
     const sql = `
       SELECT * FROM covoiturage 
-      WHERE lieu_depart LIKE ? AND lieu_arrivee LIKE ?
+      WHERE lieu_depart LIKE ? AND lieu_arrivee LIKE ? AND date_depart = ?
     `;
 
-    const [rows] = await db.query(sql, [`%${lieu_depart}%`, `%${lieu_arrivee}%`]);
+    const [rows] = await db.query(sql, [`%${lieu_depart}%`, `%${lieu_arrivee}%`, date]);
     res.status(200).json(rows);
   } catch (error) {
     console.error('Erreur recherche itinéraire :', error);
     res.status(500).json({ error: 'Erreur serveur' });
+  }
+};
+
+export const getCovoiturageById = async (req: Request, res: Response) => {
+  const id = req.params.id;
+
+  try {
+    const [rows] = await db.query(
+      `SELECT * FROM covoiturage WHERE covoiturage_id = ?`,
+      [id]
+    );
+
+    if ((rows as any[]).length === 0) {
+      res.status(404).json({ message: 'Covoiturage non trouvé' });
+    }
+
+    const covoiturage = (rows as any[])[0];
+
+    // Optionnel : récupérer voiture, conducteur, etc. en join
+    // const [voiture] = await db.query('SELECT * FROM voiture WHERE voiture_id = ?', [covoiturage.voiture_id]);
+
+    res.json(covoiturage);
+  } catch (error) {
+    console.error('Erreur getById:', error);
+    res.status(500).json({ message: 'Erreur serveur' });
   }
 };
