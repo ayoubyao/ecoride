@@ -54,3 +54,30 @@ export const loginUser = async (req: Request, res: Response) => {
      res.status(500).json({ message: "Erreur serveur", error });
   }
 };
+
+export const registerUser = async (req: Request, res: Response) => {
+  const { email, pseudo, password } = req.body;
+
+  if (!email || !pseudo || !password) {
+     res.status(400).json({ message: "Champs requis manquants" });
+  }
+
+  try {
+    const [existing] = await db.query("SELECT * FROM utilisateur WHERE email = ?", [email]);
+    if ((existing as any[]).length > 0) {
+       res.status(409).json({ message: "Email déjà utilisé" });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    await db.query(
+      "INSERT INTO utilisateur (email, pseudo, password, credit) VALUES (?, ?, ?, ?)",
+      [email, pseudo, hashedPassword, 10]
+    );
+
+     res.status(201).json({ message: "Utilisateur créé avec succès" });
+  } catch (error) {
+    console.error("Erreur register:", error);
+     res.status(500).json({ message: "Erreur serveur", error });
+  }
+};

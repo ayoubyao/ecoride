@@ -1,12 +1,13 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import userRoutes from "./routes/user.routes";
+import users from "./routes/user.routes";
 import { connectDB } from "./config/db";
 import avisRoutes from "./routes/avis.routes";
 import { connectMongo } from "./config/mongo";
 import covoiturage from "./routes/covoiturage.routes";
-
+import covoiturageRoutes from "./routes/covoiturage.routes";
+import authRoutes from "./routes/auth.routes";
 
 
 dotenv.config();
@@ -17,8 +18,11 @@ const PORT = process.env.PORT || 3010;
 app.use(cors());
 app.use(express.json());
 
-app.use("/api/users", userRoutes);
-app.use("/api/covoiturage", covoiturage)
+app.use("/api/users", users);
+app.use("/api/covoiturage", covoiturage);
+app.use("/api/auth", authRoutes);
+app.use("/api/covoiturages", covoiturageRoutes);
+
 
 connectDB();
 

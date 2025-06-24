@@ -24,4 +24,8 @@ export class User {
       throw error;
     }
   }
+
+  public static async login(username:string, pasword:string) {
+    
+  }
 }
