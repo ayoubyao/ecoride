@@ -178,13 +178,46 @@ export const getCovoiturageById = async (req: Request, res: Response) => {
   }};
 
 export const rechercherCovoiturages = async (req: Request, res: Response) => {
-  const { depart, arrivee, date } = req.body;
+  const {
+    depart, arrivee, date,
+    prix_max, duree_max, note_min, ecologique   
+  } = req.body;
 
   if (!depart || !arrivee || !date) {
      res.status(400).json({ message: "Champs requis manquants" });
   }
 
   try {
+    // Construction dynamique des conditions SQL
+    let conditions = `
+      c.lieu_depart = ? 
+      AND c.lieu_arrivee = ? 
+      AND c.date_depart = ? 
+      AND c.nb_place > 0
+    `;
+    const params: any[] = [depart, arrivee, date];
+
+    if (prix_max) {
+      conditions += " AND c.prix_personne <= ?";
+      params.push(prix_max);
+    }
+
+    if (note_min) {
+      conditions += " AND u.note >= ?";
+      params.push(note_min);
+    }
+
+    if (ecologique) {
+      conditions += " AND v.energie = 'électrique'";
+    }
+
+    if (duree_max) {
+      conditions += ` AND TIMESTAMPDIFF(MINUTE, 
+        CONCAT(c.date_depart, ' ', c.heure_depart), 
+        CONCAT(c.date_arrivee, ' ', c.heure_arrivee)) <= ?`;
+      params.push(duree_max);
+    }
+
     const [rows] = await db.query(`
       SELECT 
         c.*, 
@@ -194,12 +227,9 @@ export const rechercherCovoiturages = async (req: Request, res: Response) => {
       FROM covoiturage c
       JOIN utilisateur u ON c.utilisateur_id = u.utilisateur_id
       JOIN voiture v ON c.voiture_id = v.voiture_id
-      WHERE c.lieu_depart = ? 
-        AND c.lieu_arrivee = ? 
-        AND c.date_depart = ? 
-        AND c.nb_place > 0
+      WHERE ${conditions}
       ORDER BY c.date_depart ASC
-    `, [depart, arrivee, date]);
+    `, params);
 
     const trajets = (rows as any[]).map((row) => ({
       covoiturage_id: row.covoiturage_id,
@@ -209,7 +239,7 @@ export const rechercherCovoiturages = async (req: Request, res: Response) => {
       heure_depart: row.heure_depart,
       date_arrivee: row.date_arrivee,
       heure_arrivee: row.heure_arrivee,
-      modele:row.modele,
+      modele: row.modele,
       ecologique: row.voiture_type?.toLowerCase() === "électrique",
       chauffeur: {
         pseudo: row.pseudo,
@@ -222,13 +252,11 @@ export const rechercherCovoiturages = async (req: Request, res: Response) => {
        res.status(200).json(trajets);
     }
 
-    // Aucun résultat trouvé → proposer le plus proche
+    // Aucun résultat → chercher le plus proche
     const [prochainRows] = await db.query(`
       SELECT 
-        c.*, 
-        u.pseudo, u.photo, u.note,
-        v.energie AS voiture_type,
-        v.modele
+        c.*, u.pseudo, u.photo, u.note,
+        v.energie AS voiture_type, v.modele
       FROM covoiturage c
       JOIN utilisateur u ON c.utilisateur_id = u.utilisateur_id
       JOIN voiture v ON c.voiture_id = v.voiture_id
@@ -260,9 +288,10 @@ export const rechercherCovoiturages = async (req: Request, res: Response) => {
      res.status(200).json({ prochain });
   } catch (error) {
     console.error("Erreur recherche covoiturages :", error);
-     res.status(500).json({ message: "Erreur serveur", error });
+    res.status(500).json({ message: "Erreur serveur", error });
   }
 };
+
 
 export const getCovoiturageDetail = async (req: Request, res: Response) => {
   const { id } = req.params;

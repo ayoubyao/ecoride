@@ -3,7 +3,7 @@ import CovoiturageCard from "../components/CovoiturageCard";
 import { Covoiturage } from "../services/covoiturage";
 
 export default function VoirCovoiturages() {
-  const [form, setForm] = useState({ depart: "", arrivee: "", date: "" });
+  const [form, setForm] = useState({ depart: "", arrivee: "", date: "" ,prix_max: 0, duree_max: 0, note_min: 0, ecologique: false,});
   const [results, setResults] = useState<any[]>([]);
   const [message, setMessage] = useState("");
 
@@ -16,7 +16,7 @@ export default function VoirCovoiturages() {
     setMessage("Recherche en cours...");
 
     try {
-      const data = await Covoiturage.searchItineraire(form.depart,form.arrivee,form.date)
+      const data = await Covoiturage.searchItineraire(form.depart, form.arrivee, form.date, form.prix_max, form.duree_max, form.note_min, form.ecologique )
 
       if (data == null || data.prochain) {
         setMessage("Aucun covoiturage trouvé. Voici le plus proche disponible :");
@@ -41,6 +41,34 @@ export default function VoirCovoiturages() {
         <button className="col-span-1 sm:col-span-3 bg-blue-600 text-white py-2 rounded hover:bg-blue-700">
           Rechercher
         </button>
+
+        <input
+          type="number"
+          name="prix_max"
+          placeholder="Prix maximum (€)"
+          onChange={handleChange}
+          className="input"
+        />
+        <input
+          type="number"
+          name="duree_max"
+          placeholder="Durée max (min)"
+          onChange={handleChange}
+          className="input"
+        />
+        <input
+          type="number"
+          name="note_min"
+          placeholder="Note min chauffeur"
+          onChange={handleChange}
+          className="input"
+        />
+        <label className="flex items-center space-x-2">
+          <input type="checkbox" name="ecologique" onChange={(e) =>
+            setForm({ ...form, ecologique: e.target.checked })} />
+          <span>Écologique seulement</span>
+        </label>
+
       </form>
 
       {message && <p className="text-center text-gray-700 mb-4">{message}</p>}

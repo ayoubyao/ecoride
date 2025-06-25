@@ -23,12 +23,20 @@ export class Covoiturage {
 
   }
 
-  static async searchItineraire(depart: string, arrivee: string, date: string) {
+  static async searchItineraire(depart: string, arrivee: string, date: string, prix_max:number = 0,duree_max:number = 0,note_min:number = 0,ecologique:boolean = false) {
+    let eco = 'essence';
+    if(ecologique==true){
+        eco = "electrique"
+    }
     try {
       const res = await axios.post(`${this.apiUrl}/covoiturage/rechercher`, {
         depart,
         arrivee,
-        date
+        date,
+        prix_max,
+        duree_max,
+        note_min,
+        eco
       });
       return res.data;
     } catch (err) {

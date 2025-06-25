@@ -15,7 +15,7 @@ export default function ItineraireSearch() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const data = await Covoiturage.searchItineraire(depart, arrivee, date);
+    const data = await Covoiturage.searchItineraire(depart, arrivee, date   );
     setResultats(data);
      if (data == null || data.prochain) {
         setResultats(data.prochain || []);
