@@ -24,6 +24,7 @@ function App() {
             <Route path="/covoiturage/:id" element={<CovoiturageDetails />} />
             <Route path="/covoiturage" element={<VoirCovoiturages />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/profile" element={<Profile />} />
           </Routes>
         </main>
         <Footer />

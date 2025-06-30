@@ -23,10 +23,10 @@ export class Covoiturage {
 
   }
 
-  static async searchItineraire(depart: string, arrivee: string, date: string, prix_max:number = 0,duree_max:number = 0,note_min:number = 0,ecologique:boolean = false) {
+  static async searchItineraire(depart: string, arrivee: string, date: string, prix_max: number = 0, duree_max: number = 0, note_min: number = 0, ecologique: boolean = false) {
     let eco = 'essence';
-    if(ecologique==true){
-        eco = "electrique"
+    if (ecologique == true) {
+      eco = "electrique"
     }
     try {
       const res = await axios.post(`${this.apiUrl}/covoiturage/rechercher`, {
@@ -59,6 +59,38 @@ export class Covoiturage {
     }
 
   }
+
+  public static async getHistoriqueCovoiturages(utilisateurId: number) {
+
+    try {
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/covoiturage/${utilisateurId}/searchcovoiturage`);
+      return res.data;
+    } catch (error) {
+      console.error("error dans la recuperation des historique de covoiturage: " + error)
+    }
+
+  }
+
+  public static async annulerCovoiturage(utilisateurId: number, covoiturageId: number) {
+
+    try {
+      const res = await axios.post(`${import.meta.env.VITE_API_URL}/covoiturage/${covoiturageId}/annuler`, { utilisateurId });
+      return res.data;
+    } catch (error) {
+      console.error("error dans l'annulation du covoiturage: " + error)
+    }
+
+  }
+
+  public static async actionCovoiturage(id: number, action: string) {
+    try {
+      const res = await axios.put(`${import.meta.env.VITE_API_URL}/covoiturage/${id}/${action}`)
+      return res.data;
+    } catch (error) {
+      console.error("error dans les actions du covoiturage : " + error);
+    }
+  }
+
 
 }
 

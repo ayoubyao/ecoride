@@ -358,3 +358,108 @@ export const ajouterAvis = async (req: Request, res: Response) => {
   );
   res.status(201).json({ message: "Avis ajouté." });
 };
+
+export const getHistoriqueCovoiturages = async (req: Request, res: Response) => {
+  const utilisateurId = req.params.id;
+
+  try {
+    const [trajets] = await db.query(`
+      SELECT c.*, u.pseudo AS chauffeur_pseudo
+      FROM covoiturage c
+      LEFT JOIN utilisateur_covoiturage uc ON c.covoiturage_id = uc.covoiturage_id
+      LEFT JOIN utilisateur u ON c.utilisateur_id = u.utilisateur_id
+      WHERE c.utilisateur_id = ? OR uc.utilisateur_id = ?
+      ORDER BY c.date_depart DESC
+    `, [utilisateurId, utilisateurId]);
+
+    res.status(200).json(trajets);
+  } catch (error) {
+    console.error("Erreur historique :", error);
+    res.status(500).json({ message: "Erreur serveur", error });
+  }
+};
+
+export const annulerCovoiturage = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const utilisateurId = req.body.utilisateurId; // à sécuriser via JWT idéalement
+
+  try {
+    // Récupérer le covoiturage
+    const [covoiturage] = await db.query(
+      "SELECT * FROM covoiturage WHERE covoiturage_id = ?",
+      [id]
+    );
+
+    if (!covoiturage) res.status(404).json({ message: "Covoiturage introuvable" });
+
+    const result = (covoiturage as any[])[0];
+    const isChauffeur = result.utilisateur_id === +utilisateurId;
+
+    if (isChauffeur) {
+      // Supprimer et rembourser tous les participants
+      const [participants]: any[] = await db.query(
+        "SELECT utilisateur_id FROM utilisateur_covoiturage WHERE covoiturage_id = ?",
+        [id]
+      );
+
+      for (const p of participants) {
+        await db.query("UPDATE utilisateur SET credit = credit + 1 WHERE utilisateur_id = ?", [p.utilisateur_id]);
+        // Envoi email ici si SMTP configuré
+      }
+
+      await db.query("DELETE FROM utilisateur_covoiturage WHERE covoiturage_id = ?", [id]);
+      await db.query("UPDATE utilisateur SET credit = credit + 2 WHERE utilisateur_id = ?", [utilisateurId]);
+      await db.query("DELETE FROM covoiturage WHERE covoiturage_id = ?", [id]);
+
+      res.status(200).json({ message: "Trajet annulé. Participants remboursés." });
+    } else {
+      // Participant annule => supprime et rembourse 1 crédit
+      await db.query("DELETE FROM utilisateur_covoiturage WHERE covoiturage_id = ? AND utilisateur_id = ?", [id, utilisateurId]);
+      await db.query("UPDATE utilisateur SET credit = credit + 1 WHERE utilisateur_id = ?", [utilisateurId]);
+      await db.query("UPDATE covoiturage SET nb_place = nb_place + 1 WHERE covoiturage_id = ?", [id]);
+
+      res.status(200).json({ message: "Participation annulée" });
+    }
+
+  } catch (error) {
+    console.error("Erreur annulation :", error);
+    res.status(500).json({ message: "Erreur serveur", error });
+  }
+  
+};
+
+export const demarrerCovoiturage = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  try {
+    await db.query("UPDATE covoiturage SET statut = 'en_cours' WHERE covoiturage_id = ?", [id]);
+    // Simule l'envoi d'un mail
+    console.log(`📧 Covoiturage ${id} démarré – notification envoyée.`);
+    res.status(200).json({ message: "Covoiturage démarré" });
+  } catch (error) {
+    console.error("Erreur démarrage :", error);
+    res.status(500).json({ message: "Erreur serveur" });
+  }
+};
+
+export const terminerCovoiturage = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  try {
+    // 1. Marquer terminé
+    await db.query("UPDATE covoiturage SET statut = 'termine' WHERE covoiturage_id = ?", [id]);
+
+    // 2. Récupérer les participants
+    const [participants] = await db.query(
+      "SELECT utilisateur_id FROM utilisateur_covoiturage WHERE covoiturage_id = ?", [id]);
+
+    // 3. Notification (console ici)
+    console.log("📧 Participants notifiés :", participants);
+
+    // 4. À ce stade, on attend la validation utilisateur et l'ajout d'un avis côté frontend
+
+    res.status(200).json({ message: "Covoiturage terminé. Participants notifiés." });
+  } catch (error) {
+    console.error("Erreur fin covoiturage :", error);
+    res.status(500).json({ message: "Erreur serveur" });
+  }
+};
+

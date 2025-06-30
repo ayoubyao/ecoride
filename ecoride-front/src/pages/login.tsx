@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { User } from "../services/users";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -11,21 +12,23 @@ export default function Login() {
     e.preventDefault();
 
     try {
-      const res = await fetch("http://localhost:3010/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
 
-      const data = await res.json();
 
-      if (!res.ok) {
+      const data = await User.login(email, password);
+
+
+      if (data.message != "Connexion réussie") {
         setError(data.message || "Échec de connexion");
         return;
       }
 
       localStorage.setItem("token", data.token);
+      localStorage.setItem("userid", data.utilisateur.id)
       window.dispatchEvent(new Event("storage")); // ✅ met à jour l'icône en direct
+
+      const profil = await User.getUserProfile(data.utilisateur.id);
+      localStorage.setItem("userProfile", JSON.stringify(profil));
+
       navigate("/"); // redirige vers accueil
     } catch (err) {
       setError("Erreur serveur");

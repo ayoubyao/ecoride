@@ -2,6 +2,35 @@ import { Request, Response } from "express";
 import { db } from "../config/db";
 import bcrypt from 'bcrypt';
 
+export const getProfilUtilisateur = async (req: Request, res: Response) => {
+  const utilisateurId = req.params.id;
+
+  try {
+    const [user] = await db.query(
+      `SELECT utilisateur_id, nom, prenom, email, pseudo, role, credit, photo, note FROM utilisateur WHERE utilisateur_id = ?`,
+      [utilisateurId]
+    );
+
+    const [pref] = await db.query(
+      `SELECT fumeur, animaux, preference_custom FROM preference WHERE utilisateur_id = ?`,
+      [utilisateurId]
+    );
+
+    const [vehicules] = await db.query(
+      `SELECT voiture_id, immatriculation, modele, couleur, energie, date_premiere_immatriculation, marque_id FROM voiture WHERE utilisateur_id = ?`,
+      [utilisateurId]
+    );
+
+    res.status(200).json({
+      utilisateur: user,
+      preferences: pref || null,
+      vehicules: vehicules || [],
+    });
+  } catch (error) {
+    console.error("Erreur getProfilUtilisateur :", error);
+    res.status(500).json({ message: "Erreur serveur", error });
+  }
+};
 
 
 export const getAllUsers = async (req: Request, res: Response) => {
@@ -70,3 +99,50 @@ export const definirRoleEtInfos = async (req: Request, res: Response) => {
   }
 };
 
+export const definirProfilUtilisateur = async (req: Request, res: Response) => {
+  const { utilisateurId, role, vehicules, prefs } = req.body;
+
+  if (!utilisateurId || !role) {
+     res.status(400).json({ message: "Champs requis manquants." });
+  }
+
+  try {
+    // MAJ rôle utilisateur
+    await db.query("UPDATE utilisateur SET role = ? WHERE utilisateur_id = ?", [role, utilisateurId]);
+
+    // Supprimer anciens véhicules (optionnel)
+    await db.query("DELETE FROM voiture WHERE utilisateur_id = ?", [utilisateurId]);
+
+    // Insertion véhicules si chauffeur
+    if (role !== "passager" && Array.isArray(vehicules)) {
+      for (const v of vehicules) {
+        await db.query(`
+          INSERT INTO voiture (immatriculation, date_premiere_immatriculation, modele, couleur, marque_id, utilisateur_id)
+          VALUES (?, ?, ?, ?, ?, ?)`, [
+          v.immatriculation,
+          v.date,
+          v.modele,
+          v.couleur,
+          v.marque_id,
+          utilisateurId
+        ]);
+      }
+    }
+
+    // Préférences
+    await db.query("DELETE FROM preference WHERE utilisateur_id = ?", [utilisateurId]);
+    await db.query(`
+      INSERT INTO preference (utilisateur_id, fumeur, animaux, preference_custom)
+      VALUES (?, ?, ?, ?)`, [
+      utilisateurId,
+      prefs.fumeur ? 1 : 0,
+      prefs.animaux ? 1 : 0,
+      prefs.preference_custom || null,
+    ]);
+
+    res.status(200).json({ message: "Profil mis à jour" });
+  } catch (error) {
+    console.error("Erreur profil :", error);
+    res.status(500).json({ message: "Erreur serveur", error });
+  }
+};
