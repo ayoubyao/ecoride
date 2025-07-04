@@ -12,24 +12,27 @@ export default function Login() {
     e.preventDefault();
 
     try {
-
-
       const data = await User.login(email, password);
 
-
-      if (data.message != "Connexion réussie") {
+      if (data.message !== "Connexion réussie") {
         setError(data.message || "Échec de connexion");
         return;
       }
 
       localStorage.setItem("token", data.token);
-      localStorage.setItem("userid", data.utilisateur.id)
+      localStorage.setItem("userid", data.utilisateur.id);
+      localStorage.setItem("role", data.utilisateur.role); // ✅ Enregistre le rôle
       window.dispatchEvent(new Event("storage")); // ✅ met à jour l'icône en direct
 
       const profil = await User.getUserProfile(data.utilisateur.id);
       localStorage.setItem("userProfile", JSON.stringify(profil));
 
-      navigate("/"); // redirige vers accueil
+      // ✅ Redirection selon le rôle
+      if (data.utilisateur.role === "employe") {
+        navigate("/employe");
+      } else {
+        navigate("/profile");
+      }
     } catch (err) {
       setError("Erreur serveur");
     }

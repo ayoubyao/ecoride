@@ -14,7 +14,7 @@ export const loginUser = async (req: Request, res: Response) => {
 
   try {
     // Vérifie si l'utilisateur existe
-    const [rows] = await db.query("SELECT * FROM utilisateur WHERE email = ?", [email]);
+    const [rows] = await db.query("SELECT * FROM utilisateur, role WHERE utilisateur.role_id = role.role_id and email = ?", [email]);
     const users = rows as any[];
 
     if (users.length === 0) {
@@ -45,8 +45,16 @@ export const loginUser = async (req: Request, res: Response) => {
       token,
       utilisateur: {
         id: user.utilisateur_id,
-        pseudo: user.pseudo,
+        nom:user.nom,
+        prenom:user.prenom,
         email: user.email,
+        telephone:user.telephone,
+        adresse:user.adresse,
+        date_naissance:user.date_naissance,
+        pseudo: user.pseudo,
+        role_id:user.role_id,
+        role:user.libelle,
+        note:user.note,
       },
     });
   } catch (error) {

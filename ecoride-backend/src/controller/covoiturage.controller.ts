@@ -116,7 +116,7 @@ export const creerVoyage = async (req: Request, res: Response)=> {
       `INSERT INTO covoiturage (
         date_depart,heure_depart,lieu_depart,date_arrivee,heure_arrivee,lieu_arrivee,nb_place,prix_personne,voiture_id,utilisateur_id,
         statut
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'en_attente')`,
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'à venir')`,
       [date_depart,heure_depart,lieu_depart,date_arrivee,heure_arrivee,lieu_arrivee,nb_place,prix_personne,voiture_id,utilisateurId]
     );
 
@@ -431,7 +431,7 @@ export const annulerCovoiturage = async (req: Request, res: Response) => {
 export const demarrerCovoiturage = async (req: Request, res: Response) => {
   const { id } = req.params;
   try {
-    await db.query("UPDATE covoiturage SET statut = 'en_cours' WHERE covoiturage_id = ?", [id]);
+    await db.query("UPDATE covoiturage SET statut = 'En cours' WHERE covoiturage_id = ?", [id]);
     // Simule l'envoi d'un mail
     console.log(`📧 Covoiturage ${id} démarré – notification envoyée.`);
     res.status(200).json({ message: "Covoiturage démarré" });

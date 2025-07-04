@@ -60,6 +60,7 @@ export default function Profile() {
       const res = await Covoiturage.actionCovoiturage(id, action)
       alert(res.message);
       // Refresh la liste
+      window.location.reload();
     } catch (err) {
       console.error(err);
       alert("Erreur lors de la mise à jour du covoiturage");
@@ -153,10 +154,10 @@ export default function Profile() {
                   </button>
                 )}
                                   {t.statut === 'à venir' && (
-                  <button className="mt-2 px-4 py-1 bg-green-600 text-white rounded hover:bg-green-700" onClick={() => handleStatut(t.id, 'demarrer')} >Démarrer</button>
+                  <button className="mt-2 px-4 py-1 bg-green-600 text-white rounded hover:bg-green-700" onClick={() => handleStatut(t.covoiturage_id, 'demarrer')} >Démarrer</button>
                 )}
-                {t.statut === 'en_attente' && (
-                  <button className="mt-2 px-4 py-1 bg-green-600 text-white rounded hover:bg-green-700" onClick={() => handleStatut(t.id, 'terminer')} >Arrivée à destination</button>
+                {t.statut === 'En cours' && (
+                  <button className="mt-2 px-4 py-1 bg-green-600 text-white rounded hover:bg-green-700" onClick={() => handleStatut(t.covoiturage_id, 'terminer')} >Arrivée à destination</button>
                 )}
               </li>
             ))}

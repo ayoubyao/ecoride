@@ -8,6 +8,8 @@ import { connectMongo } from "./config/mongo";
 import covoiturage from "./routes/covoiturage.routes";
 import covoiturageRoutes from "./routes/covoiturage.routes";
 import authRoutes from "./routes/auth.routes";
+import employeRoutes from "./routes/employe.routes";
+import adminRoutes from "./routes/admin.routes";
 
 
 dotenv.config();
@@ -21,6 +23,8 @@ app.use(express.json());
 app.use("/api/users", users);
 app.use("/api/covoiturage", covoiturage);
 app.use("/api/auth", authRoutes);
+app.use("/api/employe", employeRoutes);
+app.use("/api/admin", adminRoutes);
 
 connectDB();
 

@@ -7,7 +7,7 @@ export const getProfilUtilisateur = async (req: Request, res: Response) => {
 
   try {
     const [user] = await db.query(
-      `SELECT utilisateur_id, nom, prenom, email, pseudo, role, credit, photo, note FROM utilisateur WHERE utilisateur_id = ?`,
+      `SELECT utilisateur_id, nom, prenom, email, pseudo,  credit, photo, note, libelle as role FROM utilisateur, role WHERE utilisateur.role_id = role.role_id and utilisateur_id = ?`,
       [utilisateurId]
     );
 

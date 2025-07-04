@@ -6,6 +6,15 @@ export default function Header() {
   const [isLoggedIn, setIsLoggedIn] = useState(true);
   const [menuOpen, setMenuOpen] = useState(false);
   const navigate = useNavigate();
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    const profil = localStorage.getItem("userProfile");
+    if (profil) {
+      const parsed = JSON.parse(profil);
+      setIsAdmin(parsed?.utilisateur?.[0]?.role === "admin");
+    }
+  }, []);
 
   useEffect(() => {
     const checkToken = () => setIsLoggedIn(!!localStorage.getItem("token"));
@@ -15,7 +24,7 @@ export default function Header() {
   }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
+    localStorage.clear();
     setIsLoggedIn(false);
     setMenuOpen(false);
     window.dispatchEvent(new Event("storage")); // 🔄 met à jour les composants écoutant
@@ -30,6 +39,8 @@ export default function Header() {
           <li><Link to="/">Accueil</Link></li>
           <li><Link to="/covoiturage">Accès aux covoiturages</Link></li>
           <li><Link to="/contact">Contact</Link></li>
+          <li><Link to="/employe">Espace Employé</Link></li>
+          <li><Link to="/admin">Espace Admin</Link></li>
         </ul>
       </nav>
       {/* Menu connecté / déconnecté */}
