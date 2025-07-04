@@ -48,6 +48,8 @@ export class User {
       const res = await axios.post(`${this.apiUrl}/auth/login`, { email, password }
       );
 
+      localStorage.setItem("token",res.data.token)
+
       return res.data;
     } catch (error) {
       console.error("error de sauvegarde profil" + error)

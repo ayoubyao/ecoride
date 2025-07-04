@@ -29,22 +29,37 @@ export default function CovoiturageDetails() {
     });
   };
 
-  const handleParticipation = async () => {
-    if (!trajet || !id) return;
-    if (trajet.nb_place < 1) return alert("Aucune place disponible.");
-    if (currentUser.credit < 2) return alert("Crédits insuffisants.");
-    if (!window.confirm("Participer à ce covoiturage pour 2 crédits ?")) return;
-    if (!window.confirm("Êtes-vous sûr ? Cette action est définitive.")) return;
+ const handleParticipation = async () => {
+  if (!trajet || !id) return;
 
-    try {
-      await Covoiturage.participerCovoiturage(currentUser.id, +id);
-      alert("Participation confirmée !");
-      navigate("/user");
-    } catch (err) {
-      console.error(err);
-      alert("Erreur lors de la participation.");
-    }
-  };
+  const token = localStorage.getItem("token");
+  const userId = localStorage.getItem("userid");
+
+  if (!token || !userId) {
+    alert("Vous devez être connecté pour participer.");
+    return window.location.href = "/login";
+  }
+
+  if (trajet.nb_place < 1) {
+    alert("Aucune place disponible.");
+    return;
+  }
+
+  const confirm1 = window.confirm("Souhaitez-vous participer pour 2 crédits ?");
+  if (!confirm1) return;
+
+  const confirm2 = window.confirm("Cette action est définitive. Confirmer ?");
+  if (!confirm2) return;
+
+  try {
+    await Covoiturage.participerCovoiturage(+id, +userId);
+    alert("Participation confirmée !");
+    window.location.reload(); // ou navigate("/profile")
+  } catch (err: any) {
+    alert("Erreur : " + err.response?.data?.message || "Échec participation.");
+  }
+};
+
 
   if (loading) return <div className="p-4">Chargement...</div>;
   if (!trajet) return <div className="p-4 text-red-600">Trajet non trouvé.</div>;
