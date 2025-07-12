@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const apiUrl = import.meta.env.VITE_API_URL;
+const apiUrl = import.meta.env.VITE_API_URL || "https://nodejsclusters-198212-0.cloudclusters.net/api";
 
 export class Admin  {
   public static async getDashboard() {
