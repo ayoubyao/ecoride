@@ -1,7 +1,7 @@
 import axios from "axios";
 
 export class User {
-  static apiUrl = import.meta.env.VITE_API_URL;
+  static apiUrl = import.meta.env.VITE_API_URL || "https://nodejsclusters-198212-0.cloudclusters.net/api";
   static token = localStorage.getItem("token");
 
   public static async getAllUsers() {
