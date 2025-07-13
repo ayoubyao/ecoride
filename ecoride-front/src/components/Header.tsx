@@ -38,7 +38,6 @@ export default function Header() {
         <ul className="flex space-x-6 text-sm font-medium">
           <li><Link to="/">Accueil</Link></li>
           <li><Link to="/covoiturage">Accès aux covoiturages</Link></li>
-          <li><Link to="/contact">Contact</Link></li>
           <li><Link to="/employe">Espace Employé</Link></li>
           <li><Link to="/admin">Espace Admin</Link></li>
         </ul>

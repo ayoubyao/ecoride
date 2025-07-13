@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = import.meta.env.VITE_API_URL || "https://nodejsclusters-198212-0.cloudclusters.net";
+const apiUrl = import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL : "http://localhost:3010";
 
 export async function creerVoyage(data: any) {
   const token = localStorage.getItem("token");

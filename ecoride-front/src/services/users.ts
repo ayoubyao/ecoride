@@ -1,12 +1,13 @@
 import axios from "axios";
 
+
 export class User {
-  static apiUrl = import.meta.env.VITE_API_URL || "https://nodejsclusters-198212-0.cloudclusters.net/api";
+  static apiUrl = import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL : "http://localhost:3010";
   static token = localStorage.getItem("token");
 
   public static async getAllUsers() {
     try {
-      const res = await axios.get(`${this.apiUrl}/users`);
+      const res = await axios.get(`${this.apiUrl}/api/users`);
       return res.data;
     } catch (error) {
       console.error("Erreur lors de la récupération des utilisateurs :", error);
@@ -16,7 +17,7 @@ export class User {
 
   public static async register(myUser: User) {
     try {
-      const res = await axios.post(`${this.apiUrl}/users/register`, myUser, {
+      const res = await axios.post(`${this.apiUrl}/api/users/register`, myUser, {
         headers: { "Content-Type": "application/json" },
       });
       return res.data;
@@ -29,7 +30,7 @@ export class User {
   static async saveProfile(data: any) {
 
     try {
-      const res = await axios.post(`${this.apiUrl}/users/profil`, data, {
+      const res = await axios.post(`${this.apiUrl}/api/users/profil`, data, {
         headers: {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${this.token}`
@@ -45,7 +46,7 @@ export class User {
 
   public static async login(email: string, password: string) {
     try {
-      const res = await axios.post(`${this.apiUrl}/auth/login`, { email, password }
+      const res = await axios.post(`${this.apiUrl}/api/auth/login`, { email, password }
       );
 
       localStorage.setItem("token",res.data.token)
@@ -59,7 +60,7 @@ export class User {
 
   public static async getUserProfile(utilisateurId: number) {
     try {
-      const res = await axios.get(`${this.apiUrl}/users/${utilisateurId}`, {
+      const res = await axios.get(`${this.apiUrl}/api/users/${utilisateurId}`, {
         headers: {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${this.token}`
