@@ -1,8 +1,8 @@
 import axios from "axios";
-
+import { config } from "./config";
 
 export class User {
-  static apiUrl = import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL : "http://localhost:3010";
+  static apiUrl = config.API_URL;
   static token = localStorage.getItem("token");
 
   public static async getAllUsers() {
