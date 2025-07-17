@@ -1,14 +1,15 @@
 import mysql from "mysql2/promise";
 import dotenv from "dotenv";
+import { config } from './config.js';
 
 dotenv.config();
 
 export const db = mysql.createPool({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
-  port: 10036
+  host: config.DB_HOST,
+  user: config.DB_USER,
+  password: config.DB_PASSWORD,
+  database: config.DB_NAME,
+  port: config.DB_PORT
 });
 
 export const connectDB = async () => {
