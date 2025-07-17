@@ -1,6 +1,7 @@
 import axios from "axios";
+import { config } from "./config";
 
-const apiUrl = import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL : "http://localhost:3010";
+const apiUrl = config.API_URL;
 
 export class Covoiturage {
 
