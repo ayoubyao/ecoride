@@ -3,5 +3,5 @@ export const config = {
   DB_USER: 'alasquality',
   DB_PASSWORD: 'Ec@Ride9874',
   DB_NAME: 'ecoride',
-  PORT: 3010
+  DB_PORT: 10036
 };
