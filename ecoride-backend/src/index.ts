@@ -36,5 +36,5 @@ app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
 
-app.use("/api/avis", avisRoutes);
+app.use("/avis", avisRoutes);
 // connectMongo(); // en plus de connectDB()
