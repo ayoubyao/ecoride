@@ -20,15 +20,15 @@ const PORT = process.env.PORT || 3010;
 app.use(cors());
 app.use(express.json());
 
-app.get('/api/hello', (req, res) => {
+app.get('/hello', (req, res) => {
     res.json({ message: 'Hello from backend!' });
 });
 
-app.use("/api/users", users);
-app.use("/api/covoiturage", covoiturage);
-app.use("/api/auth", authRoutes);
-app.use("/api/employe", employeRoutes);
-app.use("/api/admin", adminRoutes);
+app.use("/users", users);
+app.use("/covoiturage", covoiturage);
+app.use("/auth", authRoutes);
+app.use("/employe", employeRoutes);
+app.use("/admin", adminRoutes);
 
 connectDB();
 
