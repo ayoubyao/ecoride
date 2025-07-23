@@ -52,8 +52,8 @@ export const RegisterUser = async (req: Request, res: Response) => {
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
     await db.query(
-      "INSERT INTO utilisateur (email, pseudo, password) VALUES (?, ?, ?)",
-      [email, pseudo, hashedPassword]
+      "INSERT INTO utilisateur (email, pseudo, password, role_id) VALUES (?, ?, ?, ?)",
+      [email, pseudo, hashedPassword, 1]
     );
     res.status(201).json({ message: "Utilisateur créé avec succès" });
   } catch (error) {
